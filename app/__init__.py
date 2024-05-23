@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -19,6 +19,11 @@ def create_app():
     app.register_blueprint(maps_bp, url_prefix='/maps')
     app.register_blueprint(real_estate_bp, url_prefix='/real_estate')
     app.register_blueprint(sports_bp, url_prefix='/sports')
+
+    # 루트 경로에 대한 라우트 추가
+    @app.route('/')
+    def home():
+        return render_template('index.html')
 
     with app.app_context():
         db.create_all()
