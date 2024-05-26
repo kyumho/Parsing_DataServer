@@ -11,8 +11,8 @@ app = Flask(__name__)
 
 news_bp = Blueprint('news', __name__)
 
-CLIENT_ID = os.getenv('CLIENT_ID')  # Naver API Client ID
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')  # Naver API Client Secret
+NAVER_CLIENT_ID = os.getenv('NAVER_CLIENT_ID')  # Naver API Client ID
+NAVER_CLIENT_SECRET = os.getenv('NAVER_CLIENT_SECRET')  # Naver API Client Secret
 
 @news_bp.route('/')
 def display_news():
@@ -32,8 +32,8 @@ def fetch_news(keyword):
     encoded_keyword = quote(keyword)  # 키워드를 UTF-8로 인코딩
     url = f"https://openapi.naver.com/v1/search/news.json?query={encoded_keyword}&display=10&start=1&sort=sim"
     headers = {
-        'X-Naver-Client-Id': CLIENT_ID,
-        'X-Naver-Client-Secret': CLIENT_SECRET
+        'X-Naver-Client-Id': NAVER_CLIENT_ID,
+        'X-Naver-Client-Secret': NAVER_CLIENT_SECRET
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:

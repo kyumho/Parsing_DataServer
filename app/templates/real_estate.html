@@ -2,12 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>부동산</title>
+    <title>부동산 정보 조회</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/real_estate.css') }}">
 </head>
 <body>
-
+    <div class="container">
+        <h1>부동산 정보 조회</h1>
+        <form id="realEstateForm">
+            <div class="form-group">
+                <label for="region">지역 시군구:</label>
+                <input type="text" id="region" name="region" required>
+            </div>
+            <div class="form-group">
+                <label for="dealYmd">계약년월 (예: 201512):</label>
+                <input type="text" id="dealYmd" name="dealYmd" required>
+            </div>
+            <button type="submit">조회</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/real_estate.js') }}"></script>
 </body>
 </html>
