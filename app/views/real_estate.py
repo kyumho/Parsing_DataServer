@@ -30,8 +30,6 @@ def fetch_and_display_real_estate_info():
 
     lawd_cd = get_lawd_cd(region)  # 지역명을 법정동 코드로 변환하는 함수
 
-    print(lawd_cd)
-
     if not lawd_cd:
         return jsonify({"error": "Unknown region"}), 400
 
@@ -42,12 +40,10 @@ def fetch_and_display_real_estate_info():
 
     real_estate_data = fetch_real_estate_data(region_cd_short, deal_ymd)
 
-    print(real_estate_data)
+    for data in real_estate_data:
+        data['거래금액'] = format(int(data['거래금액'].replace(',', '')) * 10000, ',')
 
-    # print(real_estate_data)
-
-    # analyzed_data = analyze_real_estate_data(real_estate_data)
-    # return render_template('real_estate.html', data=analyzed_data)
+    return real_estate_data
 
 
 def fetch_real_estate_data(region_cd_short, deal_ymd):
@@ -57,26 +53,35 @@ def fetch_real_estate_data(region_cd_short, deal_ymd):
         'LAWD_CD': region_cd_short,
         'DEAL_YMD': deal_ymd,
         'pageNo': '1',
-        'numOfRows': '2'
+        'numOfRows': '5'
     }
 
     response = requests.get(url, params=params)
 
     if response.status_code == 200:
-        print(response.text)
+        return parse_real_estate_xml(response.text)
     else:
         return []
 
 
-def parse_xml_response(xml_str):
-    root = ET.fromstring(xml_str)
-    result = []
+def parse_real_estate_xml(xml_data):
+    root = ET.fromstring(xml_data)
+    items = []
     for item in root.findall('.//item'):
-        data = {}
-        for child in item:
-            data[child.tag] = child.text
-        result.append(data)
-    return result
+        item_data = {
+            '거래금액': item.find('거래금액').text.strip(),
+            '건축년도': item.find('건축년도').text,
+            '년': item.find('년').text,
+            '월': item.find('월').text,
+            '일': item.find('일').text,
+            '아파트': item.find('아파트').text,
+            '전용면적': item.find('전용면적').text,
+            '층': item.find('층').text,
+            '법정동': item.find('법정동').text,
+            '도로명': item.find('도로명').text,
+        }
+        items.append(item_data)
+    return items
 
 
 def analyze_real_estate_data(data):
