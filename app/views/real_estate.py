@@ -53,7 +53,7 @@ def fetch_real_estate_data(region_cd_short, deal_ymd):
         'LAWD_CD': region_cd_short,
         'DEAL_YMD': deal_ymd,
         'pageNo': '1',
-        'numOfRows': '5'
+        'numOfRows': '10'
     }
 
     response = requests.get(url, params=params)

@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/real_estate.css') }}">
 </head>
 <body>
-    <div>
-        <div class="container">
+    <div class="main-container">
+        <div class="form-container">
             <h1>부동산 정보 조회</h1>
             <form id="realEstateForm">
                 <div class="form-group">
@@ -23,7 +23,13 @@
                 <button type="submit">조회</button>
             </form>
         </div>
-        <div id="result"></div>
+        <div class="result-container">
+            <div id="result"></div>
+            <div id="pagination" style="display: none;">
+                <button id="prev" onclick="prevPage()">이전</button>
+                <button id="next" onclick="nextPage()">다음</button>
+            </div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/real_estate.js') }}"></script>
 </body>
