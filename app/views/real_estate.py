@@ -26,6 +26,7 @@ def fetch_and_display_real_estate_info():
     data = request.json
     region = data.get('region')
     deal_ymd = data.get('dealYmd')
+    page = data.get('page', 1)
     print(f"지역: {region}, 계약년월: {deal_ymd}")
 
     lawd_cd = get_lawd_cd(region)  # 지역명을 법정동 코드로 변환하는 함수
@@ -38,7 +39,7 @@ def fetch_and_display_real_estate_info():
 
     print(f"전체 region_cd: {region_cd_full}, 잘라낸 region_cd: {region_cd_short}")
 
-    real_estate_data = fetch_real_estate_data(region_cd_short, deal_ymd)
+    real_estate_data = fetch_real_estate_data(region_cd_short, deal_ymd, page)
 
     for data in real_estate_data:
         data['거래금액'] = format(int(data['거래금액'].replace(',', '')) * 10000, ',')
@@ -46,13 +47,13 @@ def fetch_and_display_real_estate_info():
     return real_estate_data
 
 
-def fetch_real_estate_data(region_cd_short, deal_ymd):
+def fetch_real_estate_data(region_cd_short, deal_ymd, page_no):
     url = 'http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev'
     params = {
         'ServiceKey': REAL_ESTATE_TRADE_KEY,
         'LAWD_CD': region_cd_short,
         'DEAL_YMD': deal_ymd,
-        'pageNo': '1',
+        'pageNo': page_no,
         'numOfRows': '10'
     }
 

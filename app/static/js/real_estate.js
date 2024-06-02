@@ -1,99 +1,125 @@
-document.getElementById('realEstateForm').addEventListener('submit', function (event) {
-    event.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+    let currentPage = 1;
+    const form = document.getElementById('realEstateForm');
+    const resultDiv = document.getElementById('result');
+    const regionInput = document.getElementById('region');
+    const dealYmdInput = document.getElementById('dealYmd');
 
-    const region = document.getElementById('region').value;
-    const dealYmd = document.getElementById('dealYmd').value;
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        currentPage = 1;
+        fetchRealEstateData();
+    });
 
-    fetch('/real_estate/fetch_real_estate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({region, dealYmd})
-    })
-        .then(response => response.json())
-        .then(data => {
+    regionInput.addEventListener('input', clearResultsAndButtons);
+    dealYmdInput.addEventListener('input', clearResultsAndButtons);
+
+    async function fetchRealEstateData() {
+        const region = regionInput.value;
+        const dealYmd = dealYmdInput.value;
+
+        try {
+            const response = await fetch('/real_estate/fetch_real_estate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ region, dealYmd, page: currentPage })
+            });
+            const data = await response.json();
             displayResults(data);
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error:', error);
-            document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
-        });
-});
-
-function displayResults(data) {
-    const resultDiv = document.getElementById('result'); // 결과를 표시할 div
-    resultDiv.innerHTML = ''; // 기존 결과 초기화
-
-    if (data.error) {
-        resultDiv.innerHTML = `<p>Error: ${data.error}</p>`; // 에러가 있는 경우 에러 메시지 표시
-        return;
+            resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+        }
     }
 
-    if (data.length === 0) {
-        resultDiv.innerHTML = `<p>No results found.</p>`; // 결과가 없는 경우 메시지 표시
-        return;
-    }
+    function displayResults(data) {
+        resultDiv.innerHTML = ''; // 기존 결과 초기화
 
-    // 결과를 테이블 형태로 표시
-    const table = document.createElement('table');
-    table.classList.add('result-table');
+        if (data.error) {
+            resultDiv.innerHTML = `<p>Error: ${data.error}</p>`; // 에러가 있는 경우 에러 메시지 표시
+            return;
+        }
 
-    // 테이블 헤더 생성
-    const headerRow = document.createElement('tr');
-    const headers = ['거래금액', '건축년도', '년', '월', '일', '아파트', '전용면적', '층', '법정동', '도로명'];
-    headers.forEach(headerText => {
-        const headerCell = document.createElement('th');
-        headerCell.textContent = headerText;
-        headerRow.appendChild(headerCell);
-    });
-    table.appendChild(headerRow);
+        if (data.length === 0) {
+            resultDiv.innerHTML = `<p>No results found.</p>`; // 결과가 없는 경우 메시지 표시
+            return;
+        }
 
-    // 테이블 데이터 생성
-    data.forEach(item => {
-        const row = document.createElement('tr');
+        // 결과를 테이블 형태로 표시
+        const table = document.createElement('table');
+        table.classList.add('result-table');
+
+        // 테이블 헤더 생성
+        const headerRow = document.createElement('tr');
+        const headers = ['거래금액', '건축년도', '년', '월', '일', '아파트', '전용면적', '층', '법정동', '도로명'];
         headers.forEach(headerText => {
-            const cell = document.createElement('td');
-            cell.textContent = item[headerText];
-            row.appendChild(cell);
+            const headerCell = document.createElement('th');
+            headerCell.textContent = headerText;
+            headerRow.appendChild(headerCell);
         });
-        table.appendChild(row);
-    });
+        table.appendChild(headerRow);
 
-    resultDiv.appendChild(table); // 결과 div에 테이블 추가
+        // 테이블 데이터 생성
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            headers.forEach(headerText => {
+                const cell = document.createElement('td');
+                cell.textContent = item[headerText];
+                row.appendChild(cell);
+            });
+            table.appendChild(row);
+        });
 
-    // 페이지네이션 버튼 추가
-    let paginationDiv = document.getElementById('pagination');
-    if (!paginationDiv) {
-        paginationDiv = document.createElement('div');
-        paginationDiv.id = 'pagination';
-        paginationDiv.style.display = 'block';
+        resultDiv.appendChild(table); // 결과 div에 테이블 추가
 
-        const prevButton = document.createElement('button');
-        prevButton.id = 'prev';
-        prevButton.textContent = '이전';
-        prevButton.addEventListener('click', prevPage);
+        // 페이지네이션 버튼 추가
+        let paginationDiv = document.getElementById('pagination');
+        if (!paginationDiv) {
+            paginationDiv = document.createElement('div');
+            paginationDiv.id = 'pagination';
+            paginationDiv.style.display = 'block';
 
-        const nextButton = document.createElement('button');
-        nextButton.id = 'next';
-        nextButton.textContent = '다음';
-        nextButton.addEventListener('click', nextPage);
+            const prevButton = document.createElement('button');
+            prevButton.id = 'prev';
+            prevButton.textContent = '이전';
+            prevButton.addEventListener('click', prevPage);
 
-        paginationDiv.appendChild(prevButton);
-        paginationDiv.appendChild(nextButton);
+            const nextButton = document.createElement('button');
+            nextButton.id = 'next';
+            nextButton.textContent = '다음';
+            nextButton.addEventListener('click', nextPage);
 
-        resultDiv.appendChild(paginationDiv); // 결과 div에 페이지네이션 추가
-    } else {
-        paginationDiv.style.display = 'block';
+            paginationDiv.appendChild(prevButton);
+            paginationDiv.appendChild(nextButton);
+
+            resultDiv.appendChild(paginationDiv); // 결과 div에 페이지네이션 추가
+        } else {
+            paginationDiv.style.display = 'block';
+        }
     }
-}
 
-// 이전 페이지 기능 (구현 필요)
-function prevPage() {
-    console.log("Previous page clicked");
-}
+    function clearResultsAndButtons() {
+        resultDiv.innerHTML = ''; // 기존 결과 초기화
+        const paginationDiv = document.getElementById('pagination');
+        if (paginationDiv) {
+            paginationDiv.style.display = 'none'; // 페이지네이션 버튼 숨기기
+        }
+    }
 
-// 다음 페이지 기능 (구현 필요)
-function nextPage() {
-    console.log("Next page clicked");
-}
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            fetchRealEstateData();
+        }
+    }
+
+    function nextPage() {
+        currentPage++;
+        fetchRealEstateData();
+    }
+
+    // 초기 페이지네이션 버튼 숨기기
+    clearResultsAndButtons();
+});
