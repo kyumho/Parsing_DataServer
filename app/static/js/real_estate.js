@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ region, dealYmd, page: currentPage })
+                body: JSON.stringify({region, dealYmd, page: currentPage})
             });
             const data = await response.json();
             displayResults(data);

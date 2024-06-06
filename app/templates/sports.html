@@ -1,13 +1,27 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>스포츠</title>
-</head>
-<body>
-
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>스포츠</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sports.css') }}">
+    </head>
+    <body>
+        <div class="dropdown">
+            <button class="dropdown-button">리그 선택</button>
+            <div class="dropdown-content">
+                <a href="#" data-league="baseball_kbo">KBO League</a>
+                <a href="#" data-league="basketball_nba">NBA</a>
+                <a href="#" data-league="soccer_korea_kleague1">K League 1</a>
+                <a href="#" data-league="soccer_italy_serie_a">Serie A - Italy</a>
+                <a href="#" data-league="soccer_france_ligue_one">Ligue 1 - France</a>
+                <a href="#" data-league="soccer_uefa_champs_league">UEFA Champions League</a>
+            </div>
+        </div>
+        <button id="fetch-data">배당률 조회</button>
+        <div id="results"></div>
+        <script src="{{ url_for('static', filename='js/sports.js') }}"></script>
+    </body>
 </html>
