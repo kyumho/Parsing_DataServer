@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import requests
 import os
 
-
 REGIONS = 'us'
 MARKETS = 'h2h'
 ODDS_FORMAT = 'decimal'
@@ -39,20 +38,45 @@ def fetch_sports_odds():
     if response.status_code == 200:
         odds_data = response.json()
         print(odds_data)
-        probabilities = calculate_probabilities(odds_data)
-        return jsonify(probabilities)
+        events = extract_event_data(odds_data)
+        return jsonify(events)
     else:
         return jsonify({'error': 'Failed to fetch odds'}), response.status_code
 
 
-def calculate_probabilities(data):
-    probabilities = []
+def extract_event_data(data):
+    events = []
     for event in data:
+        event_info = {
+            "id": event.get('id'),
+            "sport_key": event.get('sport_key'),
+            "sport_title": event.get('sport_title'),
+            "commence_time": event.get('commence_time'),
+            "home_team": event.get('home_team'),
+            "away_team": event.get('away_team'),
+            "bookmakers": []
+        }
         for bookmaker in event['bookmakers']:
+            bookmaker_info = {
+                "key": bookmaker.get('key'),
+                "title": bookmaker.get('title'),
+                "last_update": bookmaker.get('last_update'),
+                "markets": []
+            }
             for market in bookmaker['markets']:
-                for outcome in market['outcomes']:
-                    probabilities.append({
-                        "team": outcome["name"],
-                        "probability": outcome["price"]
-                    })
-    return probabilities
+                if market['key'] == 'h2h':
+                    market_info = {
+                        "key": market.get('key'),
+                        "last_update": market.get('last_update'),
+                        "outcomes": []
+                    }
+                    for outcome in market['outcomes']:
+                        outcome_info = {
+                            "name": outcome.get('name'),
+                            "price": outcome.get('price')
+                        }
+                        market_info['outcomes'].append(outcome_info)
+                    bookmaker_info['markets'].append(market_info)
+            event_info['bookmakers'].append(bookmaker_info)
+        events.append(event_info)
+    return events
